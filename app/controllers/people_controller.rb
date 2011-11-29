@@ -128,7 +128,6 @@ class PeopleController < ApplicationController
         }
       end
     end
-
   end
 
   def retrieve_remote
