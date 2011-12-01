@@ -26,7 +26,7 @@ class Comment < ActiveRecord::Base
     t.add :id
     t.add :guid
     t.add :text
-    t.add :author, :template => :post
+    t.add :author
   end
 
 
