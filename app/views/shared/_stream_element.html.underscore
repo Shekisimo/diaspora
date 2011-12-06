@@ -34,107 +34,169 @@
             <time class="timeago" datetime="<%= created_at %>"/>
           </a>
         </span>
+      </div>
 
-        <p>
-          <%= text %>
-        </p>
+      <!-- SWITCH LOGIC -------------------------------------------------------------->
+      <% switch(post_type) {
 
-        <div class="info">
-          <% if(provider_display_name != null) { %>
-            <span class="via">
-              via <%= provider_display_name %>
-              -
-            </span>
+        case "StatusMessage": %>
+          <!-- STATUSMESSAGE -------------------------------------------------------------->
+
+          <% if(photos.length > 0) { %>
+            <% var photo = photos[0].posts %>
+            <div class="photo_attachments">
+              <div class="big_stream_photo">
+                <a href="/photos/<%= photo.id %>" class="stream-photo-link">
+                  <img src="<%= photo.processed_image.thumb_medium.url %>" class="stream-photo" data-small-photo="<%= photo.processed_image.thumb_small.url %>" data-full-photo="<%= photo.processed_image.scaled_full.url %>" />
+                </a>
+              </div>
           <% } %>
-          <span class="post_scope">
-            <%= public === true ? "Public" : "Limited" %>
+
+          <p>
+            <%= text %>
+          </p>
+          <% if(o_embed_cache !== null) { %>
+            <%= o_embed_cache.posts.data.html %>
+          <% } %>
+          <% break; %>
+
+        <% case "ActivityStreams::Photo": %>
+          <!-- AS::PHOTO -------------------------------------------------------------->
+          <a href="<%= object_url %>" class="stream-photo-link">
+            <img src="<%= image_url %>" data-small-photo="<%= image_url %>" data-full-photo="<%= image_url %>" class="stream-photo" />
+          </a>
+          <% break; %>
+
+        <% case "Reshare": %>
+          <!-- RESHARE -------------------------------------------------------------->
+          <div class="reshare">
+
+            <a href="/people/<%= root.author.id %>">
+              <img src="<%= root.author.avatar.small %>" class="avatar" data-person-id="<%= root.author.id %>"/>
+            </a>
+
+            <div class="content">
+              <div class="post_initial_info">
+                <span class="from">
+                  <a href="/people/<%= root.author.id %>">
+                    <%= root.author.name %>
+                  </a>
+                </span>
+                <span class="details">
+                  -
+                  <a href="/posts/<%= root.id %>">
+                    <time class="timeago" datetime="<%= root.created_at %>"/>
+                  </a>
+                </span>
+              </div>
+
+              <!-- duplicate from statusmessage partial -->
+              <p>
+                <%= root.text %>
+              </p>
+
+            </div>
+          </div>
+          <% break; %>
+      <% } %>
+      <!-- END SWITCH LOGIC -------------------------------------------------------------->
+
+      <div class="info">
+        <% if(provider_display_name !== null) { %>
+          <span class="via">
+            via <%= provider_display_name %>
             -
           </span>
-          <a href="#" class="focus_comment_textarea">
-            Comment
-          </a>
-        </div>
+        <% } %>
+        <span class="post_scope">
+          <%= public === true ? "Public" : "Limited" %>
+          -
+        </span>
+        <a href="#" class="focus_comment_textarea">
+          Comment
+        </a>
+      </div>
 
-        <div class="likes on_post">
-          <div class="likes_container">
-            <% if(likes_count > 0){ %>
-              <img alt="Heart" src="/images/icons/heart.png?1322618579"> 
-              <a href="/posts/<%= id %>/likes" class="expand_likes">
-                <%= likes_count %> like
+      <div class="likes on_post">
+        <div class="likes_container">
+          <% if(likes_count > 0){ %>
+            <img alt="Heart" src="/images/icons/heart.png?1322618579"> 
+            <a href="/posts/<%= id %>/likes" class="expand_likes">
+              <%= likes_count %> like
+            </a>
+            <span class="hidden likes_list"></span>
+          <% } %>
+        </div>
+      </div>
+
+      <div class="comments">
+        <div class="comment_stream">
+
+          <ul class="show_comments <%= comments_count <= 3 ? 'hidden' : '' %>">
+            <li>
+              <a href="/posts/<%= id %>/comments" class="toggle_post_comments">
+                Show <%= comments_count - 3 %> more comments
               </a>
-              <span class="hidden likes_list"></span>
-            <% } %>
-          </div>
-        </div>
+            </li>
+          </ul>
 
-        <div class="comments">
-          <div class="comment_stream">
+          <ul class="comments">
 
-            <ul class="show_comments <%= comments_count <= 3 ? 'hidden' : '' %>">
-              <li>
-                <a href="/posts/<%= id %>/comments" class="toggle_post_comments">
-                  Show <%= comments_count - 3 %> more comments
+            <% _.each(last_three_comments, function(comment) { %>
+              <li id="<%= comment.guid %>" class="comment">
+
+                <% if(comment.author.id == current_user.id || author.id == current_user.id) { %>
+                  <div class="right controls">
+                    <a href="/posts/<%= id %>/comments/<%= comment.id %>" class="delete comment_delete" data-original-title="Delete">
+                      <img alt="Deletelabel" src="/images/deletelabel.png">
+                    </a>
+                  </div>
+                <% } %>
+
+                <a href="/people/<%= author.id %>">
+                  <img src="<%= comment.author.avatar.small %>" class="avatar" data-person-id="<%= comment.author.id %>"/>
                 </a>
-              </li>
-            </ul>
 
-            <ul class="comments">
+                <div class="content">
+                  <span class="from">
+                    <a href="/people/<%= comment.author.id %>">
+                      <%= comment.author.name %>
+                    </a>
+                  </span>
 
-              <% _.each(last_three_comments, function(comment) { %>
-                <li id="<%= comment.guid %>" class="comment">
-
-                  <% if(comment.author.id == current_user.id || author.id == current_user.id) { %>
-                    <div class="right controls">
-                      <a href="/posts/<%= id %>/comments/<%= comment.id %>" class="delete comment_delete" data-original-title="Delete">
-                        <img alt="Deletelabel" src="/images/deletelabel.png">
-                      </a>
-                    </div>
-                  <% } %>
-
-                  <a href="/people/<%= author.id %>">
-                    <img src="<%= comment.author.avatar.small %>" class="avatar" data-person-id="<%= comment.author.id %>"/>
-                  </a>
-
-                  <div class="content">
-                    <span class="from">
-                      <a href="/people/<%= comment.author.id %>">
-                        <%= comment.author.name %>
-                      </a>
-                    </span>
-
+                  <span class="collapsable">
                     <p>
                       <%= comment.text %>
                     </p>
+                  </span>
 
-                    <div class="comment_info">
-                      <time class="timeago" datetime="<%= comment.created_at %>"/>
-                    </div>
-
+                  <div class="comment_info">
+                    <time class="timeago" datetime="<%= comment.created_at %>"/>
                   </div>
-                </li>
-              <% }) %>
 
-            </ul>
-
-            <div class="new_comment_form_wrapper <%= comments_count > 0 ? '' : 'hidden' %>">
-              <form accept-charset="UTF-8" action="/posts/<%= id %>/comments" class="new_comment" data-remote="true" id="new_comment_on_<%= id %>" method="post">
-                <a href="/people/<%= current_user.id %>">
-                  <img src="<%= current_user.avatar.small %>" class="avatar" data-person-id="<%= current_user.id %>"/>
-                </a>
-
-                <p>
-                  <label for="comment_text_on_<%= id %>">Comment</label>
-                  <textarea class="comment_box" id="comment_text_on_<%= id %>" name="text" rows="2" />
-                </p>
-                <div class="submit_button">
-                  <input class="comment_submit button creation" data-disable-with="Commenting..." id="comment_submit_<%= id %>" name="commit" type="submit" value="Comment" />
                 </div>
-              </form>
-            </div>
+              </li>
+            <% }) %>
 
+          </ul>
+
+          <div class="new_comment_form_wrapper <%= comments_count > 0 ? '' : 'hidden' %>">
+            <form accept-charset="UTF-8" action="/posts/<%= id %>/comments" class="new_comment" data-remote="true" id="new_comment_on_<%= id %>" method="post">
+              <a href="/people/<%= current_user.id %>">
+                <img src="<%= current_user.avatar.small %>" class="avatar" data-person-id="<%= current_user.id %>"/>
+              </a>
+
+              <p>
+                <label for="comment_text_on_<%= id %>">Comment</label>
+                <textarea class="comment_box" id="comment_text_on_<%= id %>" name="text" rows="2" />
+              </p>
+              <div class="submit_button">
+                <input class="comment_submit button creation" data-disable-with="Commenting..." id="comment_submit_<%= id %>" name="commit" type="submit" value="Comment" />
+              </div>
+            </form>
           </div>
-        </div>
 
+        </div>
       </div>
     </div>
 </div>

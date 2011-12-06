@@ -132,7 +132,6 @@ describe Post do
     end
   end
 
-
   describe 'validations' do
     it 'validates uniqueness of guid and does not throw a db error' do
       message = Factory(:status_message)
@@ -157,6 +156,13 @@ describe Post do
 
       xml.include?("person_id").should be false
       xml.include?(@user.person.diaspora_handle).should be true
+    end
+  end
+
+  describe '#post_type' do
+    it 'returns a string representation of the class constant' do
+      sm = Factory(:status_message)
+      sm.post_type.should == "StatusMessage"
     end
   end
 
