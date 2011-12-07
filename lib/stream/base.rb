@@ -48,7 +48,34 @@ class Stream::Base
 
   # @return [ActiveRecord::Relation<Post>]
   def stream_posts
-    self.posts.for_a_stream(max_time, order, self.user)
+    posts = self.posts.for_a_stream(max_time, order, self.user)
+
+    if @user
+      post_ids = posts.map{ |p| p.id }
+
+      if likes = Like.where(:target_id => post_ids)
+        like_hash = likes.inject({}) do |h, curr|
+          if h[curr.target_type]
+            h[curr.target_type] << curr.target_id
+          else
+            h[curr.target_type] = [curr.target_id]
+          end
+          h
+        end
+
+        if like_hash["Post"]
+          posts.each do |post|
+            post.liked = like_hash["Post"].include?(post.id)
+          end
+        else
+          posts
+        end
+      else
+        posts
+      end
+    else
+      posts
+    end
   end
 
   # @return [ActiveRecord::Association<Person>] AR association of people within stream's given aspects

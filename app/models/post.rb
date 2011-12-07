@@ -9,6 +9,8 @@ class Post < ActiveRecord::Base
   include Diaspora::Commentable
   include Diaspora::Shareable
 
+  attr_accessor :liked
+
   # NOTE API V1 to be extracted
   acts_as_api
   api_accessible :backbone do |t|
@@ -29,6 +31,7 @@ class Post < ActiveRecord::Base
     t.add :o_embed_cache
     t.add :root
     t.add :photos
+    t.add :liked
   end
 
   xml_attr :provider_display_name

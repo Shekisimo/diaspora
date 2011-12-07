@@ -105,13 +105,27 @@
         <% if(provider_display_name !== null) { %>
           <span class="via">
             via <%= provider_display_name %>
-            -
+            &ndash;
           </span>
         <% } %>
         <span class="post_scope">
           <%= public === true ? "Public" : "Limited" %>
-          -
+          &ndash;
         </span>
+
+        <span class="like_action">
+          <% if(liked === true) { %>
+          <a href="/posts/<%= id %>/likes/<%= 1 %>" class="unlike" data-method='delete' data-remote='true' rel='nofollow'>
+              Unlike
+            </a>
+          <% } else { %>
+            <a href="/posts/<%= id %>/likes?positive=true" class="like" data-method='post' data-remote='true' rel='nofollow'>
+              Like
+            </a>
+          <% } %>
+        </span>
+        ·
+
         <a href="#" class="focus_comment_textarea">
           Comment
         </a>
