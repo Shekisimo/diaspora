@@ -10,7 +10,7 @@ $(function() {
     },
 
     initialize: function(){
-      _.bindAll(this, "appendPost", "collectionFetched");
+      _.bindAll(this, "appendPost", "collectionFetched", "addAvatars");
 
       this.collection = new App.Collections.Stream;
       this.collection.bind("add", this.appendPost);
@@ -22,18 +22,23 @@ $(function() {
         model.toJSON(),
         App.currentUser()
       )));
+
       $(this.el).append(post);
+
+      // NOTE: this should be moved out to an after stream rendered callback
+      $("time", post).timeago();
+      $("label", post).inFieldLabels();
+
       Diaspora.BaseWidget.instantiate("StreamElement", post);
     },
 
     collectionFetched: function() {
-      this.$("time").timeago();
-      this.$("label").inFieldLabels();
+      $("#loading").addClass("hidden");
 
-      this.$("#paginate").remove();
       $(this.el).append($("<a>", {
         href: this.collection.url(),
-        id: "paginate"
+        id: "paginate",
+        'class': "paginate"
       }).text('more'));
     },
 
@@ -42,10 +47,29 @@ $(function() {
         evt.preventDefault();
       }
 
+      $("#loading").removeClass("hidden");
+      this.$("#paginate").remove();
+
       this.collection.fetch({
         add: true,
         success: this.collectionFetched
       });
+    },
+
+    // NOTE: this should be moved out to a template probably?
+    addAvatars: function() {
+      _.each(_.uniq(this.collection.models), function(post) {
+        var author = post.attributes.author;
+
+        $("#selected_aspect_contacts .content").prepend($("<a>", {
+          href: "/people/" + author.id,
+          title: author.name
+        }).html($("<img />", {
+            'class': "avatar",
+            'src': author.avatar.small,
+            'data-person-id': author.id
+          })));
+      })
     }
   });
 

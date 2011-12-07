@@ -45,3 +45,6 @@
           - else
             = t('.has_not_shared_with_you_yet', :name => @person.first_name)
 
+  - if @backbone
+    #loading
+      = image_tag "ajax-loader.gif"

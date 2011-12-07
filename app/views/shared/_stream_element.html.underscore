@@ -2,7 +2,7 @@
   <div class="right controls">
 
     <% if(author.id != current_user.id) { %>
-      <a href="/blocks?block[person_id]=<%= author.id %>" class="block_user control_icon" data-confirm="Ignore and remove user from all aspects?" data-method="post" rel="nofollow" data-original-title="Ignore">
+    <a href="/blocks?block[person_id]=<%= author.id %>" class="block_user control_icon" data-confirm="Ignore and remove <%= author.name %> from all aspects?" data-method="post" rel="nofollow" data-original-title="Ignore">
         <img alt="Ignoreuser" src="/images/icons/ignoreuser.png">
       </a>
     <% } %>

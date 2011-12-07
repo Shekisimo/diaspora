@@ -793,8 +793,9 @@ form.new_comment
       h4
         :font-weight bold
 
-a.paginate, #infscr-loading
-  :display block
+a.paginate,
+#infscr-loading,
+#loading
 
   :margin
     :top 10px
@@ -802,6 +803,10 @@ a.paginate, #infscr-loading
   :padding 8px 0
   :text-align center
   :width 100%
+
+a.paginate,
+#infscr-loading
+  :display block
 
 #main_stream
   :position relative

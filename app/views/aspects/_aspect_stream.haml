@@ -26,6 +26,10 @@
     #pagination
       =link_to(t('more'), next_page_path(:ajax_stream => stream.ajax_stream?), :class => 'paginate')
 
+- if @backbone
+  #loading
+    = image_tag "ajax-loader.gif"
+
 - if current_user.contacts.size < 2
   = render 'aspects/no_contacts_message'
 
